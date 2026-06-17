@@ -15,13 +15,17 @@ from document_export import (
     document_to_plain_text,
     output_filename,
 )
+from bypass_question.routes import router as bypass_router
 from extract import extract_document
 
 APP_DIR = Path(__file__).resolve().parent
 STATIC_DIR = APP_DIR / "static"
+BYPASS_STATIC_DIR = APP_DIR / "bypass_question" / "static"
 
 app = FastAPI(title="MMD Q&A Extractor")
 app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
+app.mount("/bypass-static", StaticFiles(directory=BYPASS_STATIC_DIR), name="bypass-static")
+app.include_router(bypass_router)
 
 
 async def _read_upload(file: UploadFile) -> tuple[str, str]:

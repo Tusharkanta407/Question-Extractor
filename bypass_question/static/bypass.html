@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bypass Question Converter</title>
+  <link rel="stylesheet" href="/static/style.css" />
+  <link rel="stylesheet" href="/bypass-static/bypass.css" />
+</head>
+<body>
+  <div class="page page-wide">
+    <header>
+      <p class="back-link"><a href="/">← MMD Q&amp;A Extractor</a></p>
+      <h1>Bypass Question Converter</h1>
+      <p>Upload a bypass <code>_rephrase.mmd</code> file. Questions are converted in <strong>batches of 8</strong> (one LLM call per batch) to SCQ / MCQ / INTEGER. Questions that cannot be fairly converted are <strong>eliminated</strong> — not forced. Edit results before download.</p>
+    </header>
+
+    <section class="upload-card" id="dropzone">
+      <input type="file" id="fileInput" accept=".mmd" hidden />
+      <div class="upload-inner">
+        <div class="upload-icon" aria-hidden="true">&#9889;</div>
+        <p class="upload-title">Drop bypass .mmd file here</p>
+        <p class="upload-hint">or <button type="button" class="link-btn" id="browseBtn">browse</button></p>
+      </div>
+    </section>
+
+    <div class="toolbar" id="toolbar" hidden>
+      <button type="button" class="btn secondary" id="estimateBtn">Preview scores</button>
+      <button type="button" class="btn primary" id="convertBtn">Convert all</button>
+    </div>
+
+    <div id="status" class="status" hidden></div>
+
+    <section id="preview" class="panel" hidden>
+      <h2>Rule-based preview</h2>
+      <p class="meta" id="previewMeta"></p>
+      <div id="previewTable" class="preview-table"></div>
+    </section>
+
+    <section id="stats" class="stats-bar" hidden>
+      <div class="stat"><span class="stat-label">Converted</span><span id="statCount">0</span></div>
+      <div class="stat"><span class="stat-label">Eliminated</span><span id="statEliminated">0</span></div>
+      <div class="stat"><span class="stat-label">Batch calls</span><span id="statBatches">0</span></div>
+      <div class="stat"><span class="stat-label">Needs review</span><span id="statReview">0</span></div>
+      <div class="stat"><span class="stat-label">Tokens (in/out/total)</span><span id="statTokens">0 / 0 / 0</span></div>
+      <div class="stat"><span class="stat-label">Model</span><span id="statModel">—</span></div>
+    </section>
+
+    <section id="eliminatedPanel" class="panel eliminated-panel" hidden>
+      <h2>Eliminated (not converted)</h2>
+      <p class="meta">These questions could not be fairly converted to objective format — left unchanged.</p>
+      <div id="eliminatedList"></div>
+    </section>
+
+    <section id="results" class="results" hidden>
+      <div class="results-header">
+        <h2>Converted questions</h2>
+        <div class="actions">
+          <button type="button" class="btn secondary" id="downloadTxtBtn">Download .txt</button>
+          <button type="button" class="btn primary" id="downloadJsonBtn">Download .json</button>
+        </div>
+      </div>
+      <div id="questionList"></div>
+    </section>
+  </div>
+
+  <script src="/bypass-static/bypass.js?v=2"></script>
+</body>
+</html>
