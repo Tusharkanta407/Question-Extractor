@@ -1,0 +1,680 @@
+{
+  "title": "2．1 Microorganisms",
+  "source_format": "ncert",
+  "source_file": "ch02_c8_microorganisms_friend_and_foe.mmd",
+  "question_count": 32,
+  "questions": [
+    {
+      "id": "activity-2-1-item0",
+      "section": "Activity 2.1",
+      "number": "",
+      "type": "ACTIVITY",
+      "stem": "Collect some moist soil from the field in a beaker and add water to it．After the soil particles have settled down，observe a drop of water from the beaker under a microscope．What do you see ？",
+      "sub_part": null,
+      "options": [],
+      "match_column_a": [],
+      "match_column_b": [],
+      "flags": {
+        "partial": false,
+        "needs_review": false,
+        "convertible": false
+      },
+      "raw_text": "\\section*{Activity 2.1}\n\nCollect some moist soil from the field in a beaker and add water to it．After the soil particles have settled down，observe a drop of water from the beaker under a microscope．What do you see ？"
+    },
+    {
+      "id": "activity-2-2-item1",
+      "section": "Activity 2.2",
+      "number": "",
+      "type": "ACTIVITY",
+      "stem": "Take a few drops of water from a pond．Spread on a glass slide and observe through a microscope．\nDo you find tiny organisms moving around？",
+      "sub_part": null,
+      "options": [],
+      "match_column_a": [],
+      "match_column_b": [],
+      "flags": {
+        "partial": false,
+        "needs_review": false,
+        "convertible": false
+      },
+      "raw_text": "\\section*{Activity 2.2}\n\nTake a few drops of water from a pond．Spread on a glass slide and observe through a microscope．\nDo you find tiny organisms moving around？"
+    },
+    {
+      "id": "activity-2-3-item2",
+      "section": "Activity 2.3",
+      "number": "",
+      "type": "ACTIVITY",
+      "stem": "Take $\\frac{1}{2} \\mathrm{~kg}$ flour (atta or maida), add some sugar and mix with warm water. Add a small amount of yeast powder and knead to make a soft dough. What do you observe after two hours? Did you find the dough rising?",
+      "sub_part": null,
+      "options": [],
+      "match_column_a": [],
+      "match_column_b": [],
+      "flags": {
+        "partial": false,
+        "needs_review": false,
+        "convertible": false
+      },
+      "raw_text": "\\section*{Activity 2.3}\n\nTake $\\frac{1}{2} \\mathrm{~kg}$ flour (atta or maida), add some sugar and mix with warm water. Add a small amount of yeast powder and knead to make a soft dough. What do you observe after two hours? Did you find the dough rising?"
+    },
+    {
+      "id": "activity-2-4-item3",
+      "section": "Activity 2.4",
+      "number": "",
+      "type": "ACTIVITY",
+      "stem": "Take a 500 mL beaker filled upto $\\frac{3}{4}$ with water. Dissolve $2-3$ teaspoons of sugar in it. Add half a\nspoon of yeast powder to the sugar solution. Keep it covered in a warm place for $4-5$ hours. Now smell the solution. Can you get a smell?",
+      "sub_part": null,
+      "options": [],
+      "match_column_a": [],
+      "match_column_b": [],
+      "flags": {
+        "partial": false,
+        "needs_review": false,
+        "convertible": false
+      },
+      "raw_text": "\\section*{Activity 2.4}\n\nTake a 500 mL beaker filled upto $\\frac{3}{4}$ with water. Dissolve $2-3$ teaspoons of sugar in it. Add half a\nspoon of yeast powder to the sugar solution. Keep it covered in a warm place for $4-5$ hours. Now smell the solution. Can you get a smell?"
+    },
+    {
+      "id": "activity-2-5-item4",
+      "section": "Activity 2.5",
+      "number": "",
+      "type": "ACTIVITY",
+      "stem": "Take two pots and fill each pot half with soil. Mark them A and B. Put plant waste in pot A and things like polythene bags, empty glass bottles and broken plastic toys in pot B. Put the pots aside. Observe them after 3-4 weeks.\nDo you find any difference in the contents of the two pots? If so, what is the difference? You will find that plant waste in pot A, has been decomposed. How did this happen? The plant waste has been converted into manure by the action of microbes. The nutrients\nreleased in the process can be used by the plants again.\nDid you notice that in pot B, the polythene bags, empty glasses, bottles and broken toy parts did not undergo any such change? The microbes could not 'act' on them and convert them into manure.",
+      "sub_part": null,
+      "options": [],
+      "match_column_a": [],
+      "match_column_b": [],
+      "flags": {
+        "partial": false,
+        "needs_review": false,
+        "convertible": false
+      },
+      "raw_text": "\\section*{Activity 2.5}\n\nTake two pots and fill each pot half with soil. Mark them A and B. Put plant waste in pot A and things like polythene bags, empty glass bottles and broken plastic toys in pot B. Put the pots aside. Observe them after 3-4 weeks.\nDo you find any difference in the contents of the two pots? If so, what is the difference? You will find that plant waste in pot A, has been decomposed. How did this happen? The plant waste has been converted into manure by the action of microbes. The nutrients\nreleased in the process can be used by the plants again.\nDid you notice that in pot B, the polythene bags, empty glasses, bottles and broken toy parts did not undergo any such change? The microbes could not 'act' on them and convert them into manure."
+    },
+    {
+      "id": "exercises-q1-a",
+      "section": "Exercises",
+      "number": "1",
+      "type": "FIB",
+      "stem": "Fill in the blanks. (a) Microorganisms can be seen with the help of a $\\_\\_\\_\\_$ .",
+      "sub_part": "a",
+      "options": [],
+      "match_column_a": [],
+      "match_column_b": [],
+      "flags": {
+        "partial": false,
+        "needs_review": false,
+        "convertible": false
+      },
+      "raw_text": "(a) Microorganisms can be seen with the help of a $\\_\\_\\_\\_$ ."
+    },
+    {
+      "id": "exercises-q1-b",
+      "section": "Exercises",
+      "number": "1",
+      "type": "FIB",
+      "stem": "Fill in the blanks. (b) Blue green algae fix $\\_\\_\\_\\_$ directly from air and enhance fertility of soil.",
+      "sub_part": "b",
+      "options": [],
+      "match_column_a": [],
+      "match_column_b": [],
+      "flags": {
+        "partial": false,
+        "needs_review": false,
+        "convertible": false
+      },
+      "raw_text": "(b) Blue green algae fix $\\_\\_\\_\\_$ directly from air and enhance fertility of soil."
+    },
+    {
+      "id": "exercises-q1-c",
+      "section": "Exercises",
+      "number": "1",
+      "type": "FIB",
+      "stem": "Fill in the blanks. (c) Alcohol is produced with the help of $\\_\\_\\_\\_$ .",
+      "sub_part": "c",
+      "options": [],
+      "match_column_a": [],
+      "match_column_b": [],
+      "flags": {
+        "partial": false,
+        "needs_review": false,
+        "convertible": false
+      },
+      "raw_text": "(c) Alcohol is produced with the help of $\\_\\_\\_\\_$ ."
+    },
+    {
+      "id": "exercises-q1-d",
+      "section": "Exercises",
+      "number": "1",
+      "type": "FIB",
+      "stem": "Fill in the blanks. (d) Cholera is caused by $\\_\\_\\_\\_$ .",
+      "sub_part": "d",
+      "options": [],
+      "match_column_a": [],
+      "match_column_b": [],
+      "flags": {
+        "partial": false,
+        "needs_review": false,
+        "convertible": false
+      },
+      "raw_text": "(d) Cholera is caused by $\\_\\_\\_\\_$ ."
+    },
+    {
+      "id": "exercises-q2-a",
+      "section": "Exercises",
+      "number": "2",
+      "type": "SCQ",
+      "stem": "Yeast is used in the production of",
+      "sub_part": "a",
+      "options": [],
+      "match_column_a": [],
+      "match_column_b": [],
+      "flags": {
+        "partial": true,
+        "needs_review": false,
+        "convertible": false
+      },
+      "raw_text": "Yeast is used in the production of"
+    },
+    {
+      "id": "exercises-q2-i",
+      "section": "Exercises",
+      "number": "2",
+      "type": "SCQ",
+      "stem": "sugar",
+      "sub_part": "i",
+      "options": [
+        {
+          "label": "ii",
+          "text": "alcohol"
+        },
+        {
+          "label": "iii",
+          "text": "hydrochloric acid"
+        },
+        {
+          "label": "iv",
+          "text": "oxygen"
+        }
+      ],
+      "match_column_a": [],
+      "match_column_b": [],
+      "flags": {
+        "partial": false,
+        "needs_review": false,
+        "convertible": false
+      },
+      "raw_text": "sugar\n(ii) alcohol\n(iii) hydrochloric acid\n(iv) oxygen"
+    },
+    {
+      "id": "exercises-q2-b",
+      "section": "Exercises",
+      "number": "2",
+      "type": "SCQ",
+      "stem": "The following is an antibiotic",
+      "sub_part": "b",
+      "options": [],
+      "match_column_a": [],
+      "match_column_b": [],
+      "flags": {
+        "partial": true,
+        "needs_review": false,
+        "convertible": false
+      },
+      "raw_text": "The following is an antibiotic"
+    },
+    {
+      "id": "exercises-q2-i",
+      "section": "Exercises",
+      "number": "2",
+      "type": "SCQ",
+      "stem": "Sodium bicarbonate",
+      "sub_part": "i",
+      "options": [
+        {
+          "label": "ii",
+          "text": "Streptomycin"
+        },
+        {
+          "label": "iii",
+          "text": "Alcohol"
+        },
+        {
+          "label": "iv",
+          "text": "Yeast"
+        }
+      ],
+      "match_column_a": [],
+      "match_column_b": [],
+      "flags": {
+        "partial": false,
+        "needs_review": false,
+        "convertible": false
+      },
+      "raw_text": "Sodium bicarbonate\n(ii) Streptomycin\n(iii) Alcohol\n(iv) Yeast"
+    },
+    {
+      "id": "exercises-q2-c",
+      "section": "Exercises",
+      "number": "2",
+      "type": "SCQ",
+      "stem": "Carrier of malaria-causing protozoan is",
+      "sub_part": "c",
+      "options": [],
+      "match_column_a": [],
+      "match_column_b": [],
+      "flags": {
+        "partial": true,
+        "needs_review": false,
+        "convertible": false
+      },
+      "raw_text": "Carrier of malaria-causing protozoan is"
+    },
+    {
+      "id": "exercises-q2-i",
+      "section": "Exercises",
+      "number": "2",
+      "type": "SCQ",
+      "stem": "female Anopheles mosquito",
+      "sub_part": "i",
+      "options": [
+        {
+          "label": "ii",
+          "text": "cockroach"
+        },
+        {
+          "label": "iii",
+          "text": "housefly"
+        },
+        {
+          "label": "iv",
+          "text": "butterfly"
+        }
+      ],
+      "match_column_a": [],
+      "match_column_b": [],
+      "flags": {
+        "partial": false,
+        "needs_review": false,
+        "convertible": false
+      },
+      "raw_text": "female Anopheles mosquito\n(ii) cockroach\n(iii) housefly\n(iv) butterfly"
+    },
+    {
+      "id": "exercises-q2-d",
+      "section": "Exercises",
+      "number": "2",
+      "type": "SCQ",
+      "stem": "The most common carrier of communicable diseases is",
+      "sub_part": "d",
+      "options": [],
+      "match_column_a": [],
+      "match_column_b": [],
+      "flags": {
+        "partial": true,
+        "needs_review": false,
+        "convertible": false
+      },
+      "raw_text": "The most common carrier of communicable diseases is"
+    },
+    {
+      "id": "exercises-q2-i",
+      "section": "Exercises",
+      "number": "2",
+      "type": "SCQ",
+      "stem": "ant",
+      "sub_part": "i",
+      "options": [
+        {
+          "label": "ii",
+          "text": "housefly"
+        },
+        {
+          "label": "iii",
+          "text": "dragonfly"
+        },
+        {
+          "label": "iv",
+          "text": "spider"
+        }
+      ],
+      "match_column_a": [],
+      "match_column_b": [],
+      "flags": {
+        "partial": false,
+        "needs_review": false,
+        "convertible": false
+      },
+      "raw_text": "ant\n(ii) housefly\n(iii) dragonfly\n(iv) spider"
+    },
+    {
+      "id": "exercises-q2-e",
+      "section": "Exercises",
+      "number": "2",
+      "type": "SCQ",
+      "stem": "The bread or idli dough rises because of",
+      "sub_part": "e",
+      "options": [],
+      "match_column_a": [],
+      "match_column_b": [],
+      "flags": {
+        "partial": true,
+        "needs_review": false,
+        "convertible": false
+      },
+      "raw_text": "The bread or idli dough rises because of"
+    },
+    {
+      "id": "exercises-q2-i",
+      "section": "Exercises",
+      "number": "2",
+      "type": "SCQ",
+      "stem": "heat",
+      "sub_part": "i",
+      "options": [
+        {
+          "label": "ii",
+          "text": "grinding"
+        },
+        {
+          "label": "iii",
+          "text": "growth of yeast cells"
+        },
+        {
+          "label": "iv",
+          "text": "kneading"
+        }
+      ],
+      "match_column_a": [],
+      "match_column_b": [],
+      "flags": {
+        "partial": false,
+        "needs_review": false,
+        "convertible": false
+      },
+      "raw_text": "heat\n(ii) grinding\n(iii) growth of yeast cells\n(iv) kneading"
+    },
+    {
+      "id": "exercises-q2-f",
+      "section": "Exercises",
+      "number": "2",
+      "type": "SCQ",
+      "stem": "The process of conversion of sugar into alcohol is called",
+      "sub_part": "f",
+      "options": [],
+      "match_column_a": [],
+      "match_column_b": [],
+      "flags": {
+        "partial": true,
+        "needs_review": false,
+        "convertible": false
+      },
+      "raw_text": "The process of conversion of sugar into alcohol is called"
+    },
+    {
+      "id": "exercises-q2-i",
+      "section": "Exercises",
+      "number": "2",
+      "type": "SCQ",
+      "stem": "nitrogen fixation",
+      "sub_part": "i",
+      "options": [
+        {
+          "label": "ii",
+          "text": "moulding"
+        },
+        {
+          "label": "iii",
+          "text": "fermentation (iv) infection"
+        }
+      ],
+      "match_column_a": [],
+      "match_column_b": [],
+      "flags": {
+        "partial": false,
+        "needs_review": false,
+        "convertible": false
+      },
+      "raw_text": "nitrogen fixation\n(ii) moulding\n(iii) fermentation (iv) infection"
+    },
+    {
+      "id": "exercises-q3",
+      "section": "Exercises",
+      "number": "3",
+      "type": "MATCH",
+      "stem": "Match the organisms in Column $\\mathbf{A}$ with their action in Column B.",
+      "sub_part": null,
+      "options": [],
+      "match_column_a": [
+        {
+          "label": "i",
+          "text": "Bacteria"
+        },
+        {
+          "label": "ii",
+          "text": "Rhizobium"
+        },
+        {
+          "label": "iii",
+          "text": "Lactobacillus"
+        },
+        {
+          "label": "iv",
+          "text": "Yeast"
+        },
+        {
+          "label": "v",
+          "text": "A protozoan"
+        },
+        {
+          "label": "vi",
+          "text": "A virus"
+        }
+      ],
+      "match_column_b": [
+        {
+          "label": "a",
+          "text": "Fixing nitrogen"
+        },
+        {
+          "label": "b",
+          "text": "Setting of curd"
+        },
+        {
+          "label": "c",
+          "text": "Baking of bread"
+        },
+        {
+          "label": "d",
+          "text": "Causing malaria"
+        },
+        {
+          "label": "e",
+          "text": "Causing cholera"
+        },
+        {
+          "label": "f",
+          "text": "Causing AIDS"
+        },
+        {
+          "label": "g",
+          "text": "Producing antibodies"
+        }
+      ],
+      "flags": {
+        "partial": false,
+        "needs_review": false,
+        "convertible": false
+      },
+      "raw_text": "3. Match the organisms in Column $\\mathbf{A}$ with their action in Column B.\nA\nB\n(i) Bacteria\n(a) Fixing nitrogen\n(ii) Rhizobium\n(b) Setting of curd\n(iii) Lactobacillus\n(c) Baking of bread\n(iv) Yeast\n(d) Causing malaria\n(v) A protozoan\n(e) Causing cholera\n(vi) A virus\n(f) Causing AIDS\n(g) Producing antibodies"
+    },
+    {
+      "id": "exercises-q4",
+      "section": "Exercises",
+      "number": "4",
+      "type": "SAQ",
+      "stem": "Can microorganisms be seen with the naked eye? If not, how can they be seen?",
+      "sub_part": null,
+      "options": [],
+      "match_column_a": [],
+      "match_column_b": [],
+      "flags": {
+        "partial": false,
+        "needs_review": false,
+        "convertible": true
+      },
+      "raw_text": "4. Can microorganisms be seen with the naked eye? If not, how can they be seen?"
+    },
+    {
+      "id": "exercises-q5",
+      "section": "Exercises",
+      "number": "5",
+      "type": "SAQ",
+      "stem": "What are the major groups of microorganisms?",
+      "sub_part": null,
+      "options": [],
+      "match_column_a": [],
+      "match_column_b": [],
+      "flags": {
+        "partial": false,
+        "needs_review": false,
+        "convertible": true
+      },
+      "raw_text": "5. What are the major groups of microorganisms?"
+    },
+    {
+      "id": "exercises-q6",
+      "section": "Exercises",
+      "number": "6",
+      "type": "SAQ",
+      "stem": "Name the microorganisms which can fix atmospheric nitrogen in the soil.",
+      "sub_part": null,
+      "options": [],
+      "match_column_a": [],
+      "match_column_b": [],
+      "flags": {
+        "partial": false,
+        "needs_review": false,
+        "convertible": true
+      },
+      "raw_text": "6. Name the microorganisms which can fix atmospheric nitrogen in the soil."
+    },
+    {
+      "id": "exercises-q7",
+      "section": "Exercises",
+      "number": "7",
+      "type": "SAQ",
+      "stem": "Write 10 lines on the usefulness of microorganisms in our lives.",
+      "sub_part": null,
+      "options": [],
+      "match_column_a": [],
+      "match_column_b": [],
+      "flags": {
+        "partial": false,
+        "needs_review": false,
+        "convertible": true
+      },
+      "raw_text": "7. Write 10 lines on the usefulness of microorganisms in our lives."
+    },
+    {
+      "id": "exercises-q8",
+      "section": "Exercises",
+      "number": "8",
+      "type": "SAQ",
+      "stem": "Write a short paragraph on the harmful effects of microorganisms.",
+      "sub_part": null,
+      "options": [],
+      "match_column_a": [],
+      "match_column_b": [],
+      "flags": {
+        "partial": false,
+        "needs_review": false,
+        "convertible": true
+      },
+      "raw_text": "8. Write a short paragraph on the harmful effects of microorganisms."
+    },
+    {
+      "id": "exercises-q9",
+      "section": "Exercises",
+      "number": "9",
+      "type": "SAQ",
+      "stem": "What are antibiotics? What precautions must be taken while taking antibiotics?",
+      "sub_part": null,
+      "options": [],
+      "match_column_a": [],
+      "match_column_b": [],
+      "flags": {
+        "partial": false,
+        "needs_review": false,
+        "convertible": true
+      },
+      "raw_text": "9. What are antibiotics? What precautions must be taken while taking antibiotics?"
+    },
+    {
+      "id": "extended-learning-activities-a-q1",
+      "section": "Extended Learning - Activities and Projects",
+      "number": "1",
+      "type": "ACTIVITY",
+      "stem": "1. Pull out a gram or bean plant from the field. Observe its roots. You will find round structures called root nodules on the roots. Draw a diagram of the root and show the root nodules.",
+      "sub_part": null,
+      "options": [],
+      "match_column_a": [],
+      "match_column_b": [],
+      "flags": {
+        "partial": false,
+        "needs_review": false,
+        "convertible": false
+      },
+      "raw_text": "1. Pull out a gram or bean plant from the field. Observe its roots. You will find round structures called root nodules on the roots. Draw a diagram of the root and show the root nodules."
+    },
+    {
+      "id": "extended-learning-activities-a-q2",
+      "section": "Extended Learning - Activities and Projects",
+      "number": "2",
+      "type": "ACTIVITY",
+      "stem": "2. Collect the labels from the bottles of jams and jellies. Write down the list of contents printed on the labels.",
+      "sub_part": null,
+      "options": [],
+      "match_column_a": [],
+      "match_column_b": [],
+      "flags": {
+        "partial": false,
+        "needs_review": false,
+        "convertible": false
+      },
+      "raw_text": "2. Collect the labels from the bottles of jams and jellies. Write down the list of contents printed on the labels."
+    },
+    {
+      "id": "extended-learning-activities-a-q3",
+      "section": "Extended Learning - Activities and Projects",
+      "number": "3",
+      "type": "ACTIVITY",
+      "stem": "3. Visit a doctor. Find out why antibiotics should not be overused. Prepare a short report.",
+      "sub_part": null,
+      "options": [],
+      "match_column_a": [],
+      "match_column_b": [],
+      "flags": {
+        "partial": false,
+        "needs_review": false,
+        "convertible": false
+      },
+      "raw_text": "3. Visit a doctor. Find out why antibiotics should not be overused. Prepare a short report."
+    },
+    {
+      "id": "extended-learning-activities-a-q4",
+      "section": "Extended Learning - Activities and Projects",
+      "number": "4",
+      "type": "PROJECT",
+      "stem": "4. Project : Requirements - 2 test tubes, marker pen, sugar, yeast powder, 2 balloons and lime water.\nTake two test tubes and mark them A and B. Clamp these tubes in a stand and fill them with water leaving some space at the top. Put two spoonfuls of sugar in each of the test tubes. Add a spoonful of yeast in test tube B. Inflate the two balloons incompletely. Now tie the balloons on the mouths of each test tube. Keep them in a warm place, away from sunlight. Watch the setup every day for next $3-4$ days. Record your observations and think of an explanation.\nNow take another test tube filled $1 / 4$ with lime water. Remove the balloon from test tube B in such a manner that gas inside the balloon does not escape. Fit the balloon on the\ntest tube and shake well. Observe and explain.",
+      "sub_part": null,
+      "options": [],
+      "match_column_a": [],
+      "match_column_b": [],
+      "flags": {
+        "partial": false,
+        "needs_review": false,
+        "convertible": true
+      },
+      "raw_text": "4. Project : Requirements - 2 test tubes, marker pen, sugar, yeast powder, 2 balloons and lime water.\nTake two test tubes and mark them A and B. Clamp these tubes in a stand and fill them with water leaving some space at the top. Put two spoonfuls of sugar in each of the test tubes. Add a spoonful of yeast in test tube B. Inflate the two balloons incompletely. Now tie the balloons on the mouths of each test tube. Keep them in a warm place, away from sunlight. Watch the setup every day for next $3-4$ days. Record your observations and think of an explanation.\nNow take another test tube filled $1 / 4$ with lime water. Remove the balloon from test tube B in such a manner that gas inside the balloon does not escape. Fit the balloon on the\ntest tube and shake well. Observe and explain."
+    }
+  ]
+}

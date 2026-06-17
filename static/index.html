@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MMD Q&A Extractor</title>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <div class="page">
+    <header>
+      <h1>MMD Q&A Extractor</h1>
+      <p>Upload a <code>.mmd</code> file and download extracted questions as <code>.txt</code>, <code>.docx</code>, or <code>.json</code>. Supports NCERT, Foundation, and Exploration formats (auto-detected).</p>
+    </header>
+
+    <section class="upload-card" id="dropzone">
+      <input type="file" id="fileInput" accept=".mmd" hidden />
+      <div class="upload-inner">
+        <div class="upload-icon" aria-hidden="true">&#128196;</div>
+        <p class="upload-title">Drop your .mmd file here</p>
+        <p class="upload-hint">or <button type="button" class="link-btn" id="browseBtn">browse</button></p>
+      </div>
+    </section>
+
+    <div id="status" class="status" hidden></div>
+
+    <section id="result" class="result" hidden>
+      <div class="result-header">
+        <div>
+          <h2 id="resultTitle">Output</h2>
+          <p class="meta" id="resultMeta"></p>
+        </div>
+        <div class="actions">
+          <button type="button" class="btn secondary" id="copyBtn">Copy</button>
+          <button type="button" class="btn primary" id="downloadTxtBtn">Download .txt</button>
+          <button type="button" class="btn primary" id="downloadDocxBtn">Download .docx</button>
+          <button type="button" class="btn primary" id="downloadJsonBtn">Download .json</button>
+        </div>
+      </div>
+      <pre id="output" class="output"></pre>
+    </section>
+  </div>
+
+  <script src="/static/app.js?v=2"></script>
+</body>
+</html>
