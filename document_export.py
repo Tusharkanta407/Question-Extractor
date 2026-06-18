@@ -74,6 +74,33 @@ def mmd_to_document(mmd_text: str, source_format: str, title: str = "", source_f
 
 
 def document_to_plain_text(doc: ExtractedDocument) -> str:
+    if doc.source_format == "foundation":
+        from foundation.adapter import foundation_plain_text
+        from foundation.pipeline import run_pipeline
+        from pathlib import Path
+
+        if doc.source_file:
+            try:
+                p = Path(doc.source_file)
+                if p.exists():
+                    fdoc = run_pipeline(p.read_text(encoding="utf-8"), source_file=doc.source_file)
+                    return foundation_plain_text(fdoc)
+            except OSError:
+                pass
+        # fallback: structured list
+        parts: list[str] = []
+        if doc.title:
+            parts.extend([doc.title, "=" * min(60, max(len(doc.title), 20)), ""])
+        current = ""
+        for q in doc.questions:
+            if q.section != current:
+                current = q.section
+                parts.extend(["", current.upper(), "-" * len(current)])
+            parts.append(f"{q.number}. [{q.type}] {_clean_latex_inline(q.stem)}")
+            for o in q.options:
+                parts.append(f"  ({o.label}) {_clean_latex_inline(o.text)}")
+        return "\n".join(parts).strip() + "\n"
+
     if doc.source_format == "ncert" and doc.questions:
         parts: list[str] = []
         if doc.title:

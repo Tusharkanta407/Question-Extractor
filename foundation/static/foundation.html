@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Foundation Question Bank</title>
+  <link rel="stylesheet" href="/static/style.css" />
+  <link rel="stylesheet" href="/foundation-static/foundation.css" />
+</head>
+<body>
+  <div class="page page-wide">
+    <header>
+      <p class="back-link"><a href="/">← MMD Q&amp;A Extractor</a></p>
+      <h1>Foundation Question Bank</h1>
+      <p>Step 1: extract + book answers (free). Step 2: LLM fills <strong>objective only</strong> (MCQ/FIB/Integer…) in batches — skips VSA/SA/LA.</p>
+    </header>
+
+    <section class="upload-card" id="dropzone">
+      <input type="file" id="fileInput" accept=".mmd" hidden />
+      <div class="upload-inner">
+        <div class="upload-icon" aria-hidden="true">&#128218;</div>
+        <p class="upload-title">Drop Foundation .mmd file here</p>
+        <p class="upload-hint">or <button type="button" class="link-btn" id="browseBtn">browse</button></p>
+      </div>
+    </section>
+
+    <div class="toolbar" id="toolbar" hidden>
+      <label class="llm-toggle">
+        <input type="checkbox" id="useLlm" />
+        LLM fill missing objective answers only
+      </label>
+      <button type="button" class="btn primary" id="extractBtn">Extract</button>
+    </div>
+
+    <div id="status" class="status" hidden></div>
+
+    <section id="stats" class="stats-bar" hidden>
+      <div class="stat"><span class="stat-label">Questions</span><span id="statQuestions">0</span></div>
+      <div class="stat"><span class="stat-label">Book answers</span><span id="statBook">0</span></div>
+      <div class="stat"><span class="stat-label">LLM filled</span><span id="statLlm">0</span></div>
+      <div class="stat"><span class="stat-label">Subjective skipped</span><span id="statSkipped">0</span></div>
+      <div class="stat"><span class="stat-label">Obj. still missing</span><span id="statMissing">0</span></div>
+      <div class="stat"><span class="stat-label">LLM tokens (in/out)</span><span id="statLlmTokens">—</span></div>
+    </section>
+
+    <section id="result" class="result" hidden>
+      <div class="result-header">
+        <div>
+          <h2 id="resultTitle">Question Bank</h2>
+          <p class="meta" id="resultMeta"></p>
+        </div>
+        <div class="actions">
+          <button type="button" class="btn secondary" id="copyBtn">Copy</button>
+          <button type="button" class="btn primary" id="downloadDocxBtn">Download .docx</button>
+          <button type="button" class="btn primary" id="downloadMmdBtn">Download .mmd</button>
+          <button type="button" class="btn secondary" id="downloadJsonBtn">Download .json</button>
+        </div>
+      </div>
+      <pre id="output" class="output"></pre>
+    </section>
+  </div>
+  <script src="/foundation-static/foundation.js?v=3"></script>
+</body>
+</html>

@@ -33,8 +33,11 @@ def extract_document(text: str, source_file: str = "", fmt: str | None = None) -
     title = extract_title(text, fmt)
 
     if fmt == "foundation":
-        mmd = foundation.process_text(text)
-        return mmd_to_document(mmd, fmt, title=title, source_file=source_file)
+        from foundation.adapter import foundation_to_extracted
+        from foundation.pipeline import run_pipeline
+
+        fdoc = run_pipeline(text, source_file=source_file)
+        return foundation_to_extracted(fdoc)
     if fmt == "ncert":
         return ncert.extract_document(text, source_file=source_file)
     mmd = exploration.process_text(text)
@@ -97,7 +100,14 @@ def main() -> int:
         out_dir = args.output_dir or path.parent
         out_dir.mkdir(parents=True, exist_ok=True)
 
-        if args.format == "mmd":
+        if doc.source_format == "foundation" and args.format in ("txt", "mmd"):
+            from foundation.formatter import output_filename as fnd_out
+            from foundation.pipeline import process_to_question_bank
+
+            content, _ = process_to_question_bank(text, source_file=path.name)
+            out_path = out_dir / fnd_out(path.stem, "mmd")
+            out_path.write_text(content, encoding="utf-8")
+        elif args.format == "mmd":
             out_path = out_dir / f"{path.stem}_qa{path.suffix}"
             out_path.write_text(document_to_mmd(doc), encoding="utf-8")
         elif args.format == "docx":

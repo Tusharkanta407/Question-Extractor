@@ -16,16 +16,20 @@ from document_export import (
     output_filename,
 )
 from bypass_question.routes import router as bypass_router
-from extract import extract_document
+from foundation.routes import router as foundation_router
+from extract import detect_format, extract_document
 
 APP_DIR = Path(__file__).resolve().parent
 STATIC_DIR = APP_DIR / "static"
 BYPASS_STATIC_DIR = APP_DIR / "bypass_question" / "static"
+FOUNDATION_STATIC_DIR = APP_DIR / "foundation" / "static"
 
 app = FastAPI(title="MMD Q&A Extractor")
 app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 app.mount("/bypass-static", StaticFiles(directory=BYPASS_STATIC_DIR), name="bypass-static")
+app.mount("/foundation-static", StaticFiles(directory=FOUNDATION_STATIC_DIR), name="foundation-static")
 app.include_router(bypass_router)
+app.include_router(foundation_router)
 
 
 async def _read_upload(file: UploadFile) -> tuple[str, str]:
@@ -56,6 +60,34 @@ async def index() -> HTMLResponse:
 @app.post("/api/extract")
 async def extract(file: UploadFile = File(...)) -> dict:
     text, name = await _read_upload(file)
+    fmt = detect_format(text)
+    stem = Path(name).stem
+    orig_lines = text.count("\n") + (1 if text and not text.endswith("\n") else 0)
+
+    if fmt == "foundation":
+        from foundation.formatter import output_filename as foundation_output_filename
+        from foundation.pipeline import process_to_question_bank
+
+        content, fdoc = process_to_question_bank(text, source_file=name)
+        if not fdoc.questions:
+            raise HTTPException(status_code=422, detail="No questions found in this file.")
+        out_lines = content.count("\n") + 1
+        return {
+            "filename_txt": foundation_output_filename(stem, "mmd"),
+            "filename_json": foundation_output_filename(stem, "json"),
+            "title": fdoc.title,
+            "format": "foundation",
+            "content": content,
+            "json": __import__("json").dumps(fdoc.to_dict(), ensure_ascii=False, indent=2) + "\n",
+            "question_count": len(fdoc.questions),
+            "stats": {
+                "input_lines": orig_lines,
+                "output_lines": out_lines,
+                "questions": len(fdoc.questions),
+                "paired_answers": fdoc.paired_answers,
+            },
+        }
+
     doc = extract_document(text, source_file=name)
     if not doc.questions:
         raise HTTPException(

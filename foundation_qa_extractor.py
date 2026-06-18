@@ -371,10 +371,6 @@ def process_file(input_path: Path, output_dir: Path | None = None) -> Path:
 
 
 def is_foundation_format(text: str) -> bool:
-    if EXERCISE_START_RE.search(text):
-        return True
-    if re.search(r"\\section\*\{Multiple\s+Choice", text, re.IGNORECASE):
-        return True
-    if re.search(r"DIRECTIONS\s*:.*multiple\s+choice", text, re.IGNORECASE):
-        return True
-    return False
+    from foundation.pipeline import is_foundation_format as _is_foundation
+
+    return _is_foundation(text)
