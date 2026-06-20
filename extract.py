@@ -1,136 +1,60 @@
-"""Route .mmd files to the correct Q&A extractor."""
+"""
+Top-level extraction entry point.
 
+Detects format from content/filename and routes to the correct extractor.
+Validation (INTEGER check, FIB→SCQ conversion) runs automatically inside
+each extractor via validators.validate_document().
+"""
 from __future__ import annotations
-
-from pathlib import Path
-
-import foundation_qa_extractor as foundation
-import mmd_qa_extractor as exploration
-import ncert_qa_extractor as ncert
-from document_export import mmd_to_document
+import re
 from models import ExtractedDocument
 
 
-def detect_format(text: str) -> str:
-    if foundation.is_foundation_format(text):
+def detect_format(content: str, filename: str = "") -> str:
+    """
+    Detect the source format of a .mmd file.
+    Returns one of: 'foundation', 'ncert', 'bypass_question', 'unknown'
+    """
+    fn_lower = filename.lower()
+
+    # Foundation files typically have 'foundation' in name or Q-number pattern
+    if "foundation" in fn_lower:
         return "foundation"
-    if ncert.is_ncert_format(text):
-        return "ncert"
-    return "exploration"
+
+    # Bypass question files
+    if "bypass" in fn_lower:
+        return "bypass_question"
+
+    # NCERT files — Q&A with exercise blocks
+    if re.search(r"Q\d+\.\s+\[", content):
+        return "foundation"
+
+    # Fallback to ncert
+    return "ncert"
 
 
-def extract_title(text: str, fmt: str | None = None) -> str:
-    fmt = fmt or detect_format(text)
+def extract_document(content: str, filename: str = "") -> ExtractedDocument:
+    """
+    Main entry point. Detects format, extracts, validates, and returns document.
+    """
+    fmt = detect_format(content, filename)
+
     if fmt == "foundation":
-        return foundation.extract_title(text)
-    if fmt == "ncert":
-        return ncert.extract_title(text)
-    return exploration.extract_title(text)
+        from foundation_qa_extractor import extract
+        return extract(content, filename)
 
+    elif fmt == "bypass_question":
+        # Route to bypass extractor if available, else fallback
+        try:
+            from bypass_question.extractor import extract
+            return extract(content, filename)
+        except ImportError:
+            from foundation_qa_extractor import extract
+            return extract(content, filename)
 
-def extract_document(text: str, source_file: str = "", fmt: str | None = None) -> ExtractedDocument:
-    fmt = fmt or detect_format(text)
-    title = extract_title(text, fmt)
-
-    if fmt == "foundation":
-        from foundation.adapter import foundation_to_extracted
-        from foundation.pipeline import run_pipeline
-
-        fdoc = run_pipeline(text, source_file=source_file)
-        return foundation_to_extracted(fdoc)
-    if fmt == "ncert":
-        return ncert.extract_document(text, source_file=source_file)
-    mmd = exploration.process_text(text)
-    return mmd_to_document(mmd, fmt, title=title, source_file=source_file)
-
-
-def process_text(text: str, fmt: str | None = None) -> tuple[str, str]:
-    """Return (mmd_output_text, format_name) — legacy helper."""
-    doc = extract_document(text, fmt=fmt)
-    from ncert_qa_extractor import document_to_mmd
-    return document_to_mmd(doc), doc.source_format
-
-
-def process_file(input_path: Path, output_dir: Path | None = None) -> tuple[Path, str]:
-    text = input_path.read_text(encoding="utf-8")
-    doc = extract_document(text, source_file=input_path.name)
-    from ncert_qa_extractor import document_to_mmd
-    result = document_to_mmd(doc)
-    out_dir = output_dir or input_path.parent
-    out_dir.mkdir(parents=True, exist_ok=True)
-    out_path = out_dir / f"{input_path.stem}_qa{input_path.suffix}"
-    out_path.write_text(result, encoding="utf-8")
-    return out_path, doc.source_format
-
-
-def main() -> int:
-    import argparse
-    import sys
-
-    from document_export import (
-        document_to_docx_bytes,
-        document_to_json,
-        document_to_plain_text,
-        output_filename,
-    )
-    from ncert_qa_extractor import document_to_mmd
-
-    parser = argparse.ArgumentParser(
-        description="Extract Q&A from .mmd files (Exploration / Foundation / NCERT)."
-    )
-    parser.add_argument("inputs", nargs="+", help="Input .mmd file(s)")
-    parser.add_argument("-o", "--output-dir", type=Path, default=None)
-    parser.add_argument(
-        "-f",
-        "--format",
-        choices=("txt", "docx", "json", "mmd"),
-        default="txt",
-        help="Output file type (default: txt)",
-    )
-    args = parser.parse_args()
-
-    for arg in args.inputs:
-        path = Path(arg)
-        if not path.exists():
-            print(f"  [SKIP] {path} not found", file=sys.stderr)
-            continue
-
-        text = path.read_text(encoding="utf-8")
-        doc = extract_document(text, source_file=path.name)
-        out_dir = args.output_dir or path.parent
-        out_dir.mkdir(parents=True, exist_ok=True)
-
-        if doc.source_format == "foundation" and args.format in ("txt", "mmd"):
-            from foundation.formatter import output_filename as fnd_out
-            from foundation.pipeline import process_to_question_bank
-
-            content, _ = process_to_question_bank(text, source_file=path.name)
-            out_path = out_dir / fnd_out(path.stem, "mmd")
-            out_path.write_text(content, encoding="utf-8")
-        elif args.format == "mmd":
-            out_path = out_dir / f"{path.stem}_qa{path.suffix}"
-            out_path.write_text(document_to_mmd(doc), encoding="utf-8")
-        elif args.format == "docx":
-            out_path = out_dir / output_filename(path.stem, "docx")
-            out_path.write_bytes(document_to_docx_bytes(doc))
-        elif args.format == "json":
-            out_path = out_dir / output_filename(path.stem, "json")
-            out_path.write_text(document_to_json(doc), encoding="utf-8")
-        else:
-            out_path = out_dir / output_filename(path.stem, "txt")
-            out_path.write_text(document_to_plain_text(doc), encoding="utf-8")
-
-        orig = text.count("\n")
-        new = out_path.read_bytes() if args.format == "docx" else out_path.read_text(encoding="utf-8")
-        new_lines = new.count(b"\n") if args.format == "docx" else new.count("\n")
-        print(
-            f"  [OK]  {path.name}  ->  {out_path.name}  "
-            f"({doc.source_format}, {len(doc.questions)} questions, "
-            f"{args.format}, {orig} -> {new_lines} lines)"
-        )
-
-    return 0
-
-
-if __name__ == "__main__":
-    raise SystemExit(main())
+    else:
+        # NCERT / default
+        from ncert_qa_extractor import extract_document as ncert_extract
+        doc = ncert_extract(content, filename)
+        # NCERT extractor already calls validate_document internally
+        return doc
