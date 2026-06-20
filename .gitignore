@@ -15,3 +15,5 @@ env/
 # Environment files
 .env
 .env.*
+pipeline/.env
+*.env
