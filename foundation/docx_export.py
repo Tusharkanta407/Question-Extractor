@@ -1,96 +1,153 @@
-"""Export Foundation question bank to .docx."""
+"""Export Foundation document to .docx format."""
 
 from __future__ import annotations
 
-from io import BytesIO
+import random
+import re
+from pathlib import Path
 
-from foundation.formatter import _clean_latex, _type_label
-from foundation.models import FoundationDocument, FoundationQuestion
+from docx import Document
+from docx.shared import Pt, RGBColor
+from docx.enum.text import WD_ALIGN_PARAGRAPH
+
+from foundation.models import FoundationDocument, FoundationQuestion, QuestionOption
+
+_NONNEG_NUMERIC_RE = re.compile(r"^\+?\d+(\.\d+)?$")
 
 
-def document_to_docx_bytes(doc: FoundationDocument) -> bytes:
-    from docx import Document
-    from docx.shared import Pt, RGBColor
+def _is_nonneg_numeric(value: str) -> bool:
+    return bool(_NONNEG_NUMERIC_RE.match(value.strip()))
 
-    d = Document()
-    title = doc.title.upper()
-    if "QUESTION BANK" not in title:
-        title = f"{title} - QUESTION BANK"
 
-    h = d.add_heading(title, level=0)
-    h.runs[0].font.size = Pt(16)
+def _build_fib_pool(doc: FoundationDocument) -> list[str]:
+    return [
+        q.answer_key.strip()
+        for q in doc.questions
+        if q.question_type == "FIB"
+        and (q.answer_key or "").strip()
+        and not _is_nonneg_numeric(q.answer_key.strip())
+    ]
 
-    sub = d.add_paragraph(
-        f"Foundation {doc.subject} | Class {doc.class_level} | "
-        f"Total Questions: {len(doc.questions)}"
-    )
-    sub.runs[0].font.size = Pt(11)
-    sub.runs[0].font.color.rgb = RGBColor(0x5C, 0x6B, 0x7A)
 
+def _build_fib_options(correct: str, pool: list[str]) -> tuple[list[QuestionOption], str]:
+    """Build 4 MCQ options. Correct answer placed randomly in (a-d)."""
+    distractors = [p for p in pool if p.lower() != correct.lower()]
+    random.shuffle(distractors)
+    distractors = distractors[:3]
+    while len(distractors) < 3:
+        distractors.append("___")
+
+    labels = ["a", "b", "c", "d"]
+    correct_pos = random.randint(0, 3)
+    options: list[QuestionOption] = []
+    di = 0
+    for i, label in enumerate(labels):
+        if i == correct_pos:
+            options.append(QuestionOption(label=label, text=correct))
+        else:
+            options.append(QuestionOption(label=label, text=distractors[di]))
+            di += 1
+    return options, labels[correct_pos]
+
+
+def _resolve_question(
+    q: FoundationQuestion, fib_pool: list[str]
+) -> tuple[str, list[QuestionOption], str]:
+    """Returns (effective_type, effective_options, correct_display)."""
+    answer_key = (q.answer_key or "").strip()
+    q_type = q.question_type
+    opts = list(q.options or q.shared_options)
+    correct_display = answer_key
+
+    if q_type == "FIB" and answer_key and not _is_nonneg_numeric(answer_key):
+        q_type = "SCQ"
+        opts, correct_label = _build_fib_options(answer_key, fib_pool)
+        correct_display = f"({correct_label})"
+
+    return q_type, opts, correct_display
+
+
+def _clean_latex(text: str) -> str:
+    text = re.sub(r"\$\$([^$]+)\$\$", r"\1", text)
+    text = re.sub(r"\$([^$]+)\$", r"\1", text)
+    text = re.sub(r"\\mathrm\{([^}]*)\}", r"\1", text)
+    text = re.sub(r"\\text\{([^}]*)\}", r"\1", text)
+    text = re.sub(r"\\rightarrow|\\longrightarrow|\\xrightarrow\{[^}]*\}", " -> ", text)
+    text = re.sub(r"\\\s+", " ", text)
+    text = re.sub(r"\s+", " ", text)
+    return text.strip()
+
+
+def export_docx(doc: FoundationDocument, out_path: str | Path) -> Path:
+    out_path = Path(out_path)
+    docx = Document()
+
+    # Title
+    title = docx.add_heading(doc.title, level=1)
+    title.alignment = WD_ALIGN_PARAGRAPH.CENTER
+
+    sub = docx.add_paragraph(f"Foundation {doc.subject} | Class {doc.class_level}")
+    sub.alignment = WD_ALIGN_PARAGRAPH.CENTER
+
+    fib_pool = _build_fib_pool(doc)
     current_section = ""
     seq = 0
 
     for q in doc.questions:
-        if q.section != current_section:
-            current_section = q.section
-            d.add_paragraph()
-            sec = d.add_heading(q.section, level=1)
-            sec.runs[0].font.size = Pt(13)
+        section_label = q.section
+
+        if section_label != current_section:
+            current_section = section_label
+            docx.add_heading(q.section, level=2)
+
             if q.directions:
-                p = d.add_paragraph(q.directions)
+                p = docx.add_paragraph(q.directions)
                 p.runs[0].italic = True
-                p.runs[0].font.size = Pt(9)
+
             if q.passage:
-                p = d.add_paragraph(f"Passage: {_clean_latex(q.passage)}")
-                p.runs[0].font.size = Pt(10)
+                docx.add_paragraph(f"Passage: {_clean_latex(q.passage)}")
 
+        was_fib = q.question_type == "FIB"
+        q_type, opts, correct_display = _resolve_question(q, fib_pool)
         seq += 1
-        _add_question(d, q, seq)
 
-    buf = BytesIO()
-    d.save(buf)
-    return buf.getvalue()
+        # Question stem
+        stem_text = _clean_latex(q.stem.replace("\n", " "))
+        p = docx.add_paragraph()
+        run = p.add_run(f"Q{seq}. [{q_type}]  {stem_text}")
+        run.bold = True
 
+        # Options
+        for opt in opts:
+            docx.add_paragraph(
+                f"  ({opt.label}) {_clean_latex(opt.text)}",
+                style="List Bullet"
+            )
 
-def _add_question(d, q: FoundationQuestion, seq: int) -> None:
-    from docx.shared import Pt, RGBColor
+        # Column A / B (matching type)
+        if q.column_a:
+            docx.add_paragraph("  Column I")
+            for opt in q.column_a:
+                docx.add_paragraph(f"    ({opt.label}) {_clean_latex(opt.text)}")
+        if q.column_b:
+            docx.add_paragraph("  Column II")
+            for opt in q.column_b:
+                docx.add_paragraph(f"    ({opt.label}) {_clean_latex(opt.text)}")
 
-    label = _type_label(q.question_type)
-    p = d.add_paragraph()
-    run = p.add_run(f"Q{seq}. [{label}]  ")
-    run.bold = True
-    run.font.size = Pt(11)
-    p.add_run(_clean_latex(q.stem.replace("\n", " "))).font.size = Pt(11)
+        # Correct answer
+        if correct_display:
+            p = docx.add_paragraph()
+            run = p.add_run(f"► Correct Answer: {correct_display}")
+            run.font.color.rgb = RGBColor(0x00, 0x80, 0x00)
+            run.bold = True
 
-    opts = q.options or q.shared_options
-    for o in opts:
-        op = d.add_paragraph(f"({o.label}) {_clean_latex(o.text)}", style="List Bullet")
-        op.paragraph_format.left_indent = Pt(18)
-        op.runs[0].font.size = Pt(10)
+        # Explanation
+        if q.explanation:
+            src = " [LLM]" if q.answer_source == "llm" else ""
+            p = docx.add_paragraph()
+            run = p.add_run(f"★ Explanation{src}: {_clean_latex(q.explanation)}")
+            run.font.color.rgb = RGBColor(0x44, 0x44, 0x88)
+            run.italic = True
 
-    if q.column_a:
-        d.add_paragraph("Column I").runs[0].bold = True
-        for o in q.column_a:
-            d.add_paragraph(f"({o.label}) {_clean_latex(o.text)}", style="List Bullet")
-    if q.column_b:
-        d.add_paragraph("Column II").runs[0].bold = True
-        for o in q.column_b:
-            d.add_paragraph(f"({o.label}) {_clean_latex(o.text)}", style="List Bullet")
-
-    if q.answer_key:
-        ak = q.answer_key
-        if q.question_type in ("MCQ", "MCQ_MULTI", "ASSERTION_REASON") and len(ak) == 1:
-            ak = f"({ak.lower()})"
-        ap = d.add_paragraph()
-        ar = ap.add_run(f"Correct Answer: {ak}")
-        ar.bold = True
-        ar.font.color.rgb = RGBColor(0x0F, 0x76, 0x6E)
-
-    if q.explanation:
-        src = " (LLM)" if q.answer_source == "llm" else ""
-        ep = d.add_paragraph()
-        er = ep.add_run(f"Explanation{src}: ")
-        er.bold = True
-        ep.add_run(_clean_latex(q.explanation))
-
-    d.add_paragraph()
+    docx.save(out_path)
+    return out_path
