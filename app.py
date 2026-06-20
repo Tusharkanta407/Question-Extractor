@@ -17,6 +17,7 @@ from document_export import (
 )
 from bypass_question.routes import router as bypass_router
 from foundation.routes import router as foundation_router
+from pipeline.routes import router as pipeline_router
 from extract import detect_format, extract_document
 
 APP_DIR = Path(__file__).resolve().parent
@@ -30,6 +31,7 @@ app.mount("/bypass-static", StaticFiles(directory=BYPASS_STATIC_DIR), name="bypa
 app.mount("/foundation-static", StaticFiles(directory=FOUNDATION_STATIC_DIR), name="foundation-static")
 app.include_router(bypass_router)
 app.include_router(foundation_router)
+app.include_router(pipeline_router)
 
 
 async def _read_upload(file: UploadFile) -> tuple[str, str]:
