@@ -1,7 +1,6 @@
 """Shared data models for extracted questions."""
-
 from __future__ import annotations
-
+import re
 from dataclasses import asdict, dataclass, field
 
 
@@ -22,12 +21,37 @@ class Question:
     options: list[QuestionOption] = field(default_factory=list)
     match_column_a: list[QuestionOption] = field(default_factory=list)
     match_column_b: list[QuestionOption] = field(default_factory=list)
+    answer: str | None = None
     flags: dict = field(default_factory=lambda: {
         "partial": False,
         "needs_review": False,
         "convertible": False,
     })
     raw_text: str = ""
+
+    def is_valid_integer_answer(self) -> bool:
+        """Return True if answer is a non-negative integer or decimal number."""
+        if self.answer is None:
+            return False
+        val = self.answer.strip().lstrip("+")
+        try:
+            n = float(val)
+            return n >= 0
+        except ValueError:
+            return False
+
+    def set_integer_answer(self, value: str) -> None:
+        """Set answer with validation. Raises ValueError for invalid integer answers."""
+        val = value.strip().lstrip("+")
+        try:
+            n = float(val)
+            if n < 0:
+                raise ValueError(f"Integer answer must be non-negative, got: {value!r}")
+        except ValueError as e:
+            if "non-negative" in str(e):
+                raise
+            raise ValueError(f"Integer answer must be a number, got: {value!r}") from e
+        self.answer = val
 
     def to_dict(self) -> dict:
         d = asdict(self)
