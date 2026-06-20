@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import re
+import random
 
 from foundation.models import FoundationDocument, FoundationQuestion, QuestionOption
 
@@ -28,17 +29,74 @@ def _type_label(qtype: str) -> str:
     return qtype.replace("_", " ")
 
 
+_NONNEG_NUMERIC_RE = re.compile(r"^\+?\d+(\.\d+)?$")
+
+
+def _is_nonneg_numeric(value: str) -> bool:
+    return bool(_NONNEG_NUMERIC_RE.match(value.strip()))
+
+
+def _build_fib_options(correct: str, pool: list[str]) -> tuple[list[QuestionOption], str]:
+    """Build 4 MCQ options. Correct answer placed randomly in (a-d)."""
+    distractors = [p for p in pool if p.lower() != correct.lower()]
+    random.shuffle(distractors)
+    distractors = distractors[:3]
+    while len(distractors) < 3:
+        distractors.append("___")
+
+    labels = ["a", "b", "c", "d"]
+    correct_pos = random.randint(0, 3)
+    options: list[QuestionOption] = []
+    di = 0
+    for i, label in enumerate(labels):
+        if i == correct_pos:
+            options.append(QuestionOption(label=label, text=correct))
+        else:
+            options.append(QuestionOption(label=label, text=distractors[di]))
+            di += 1
+    return options, labels[correct_pos]
+
+
+def _build_fib_pool(doc: FoundationDocument) -> list[str]:
+    return [
+        q.answer_key.strip()
+        for q in doc.questions
+        if q.question_type == "FIB"
+        and (q.answer_key or "").strip()
+        and not _is_nonneg_numeric(q.answer_key.strip())
+    ]
+
+
+def _resolve_question(
+    q: FoundationQuestion, fib_pool: list[str]
+) -> tuple[str, list[QuestionOption], str]:
+    """Returns (effective_type, effective_options, correct_display)."""
+    answer_key = (q.answer_key or "").strip()
+    q_type = q.question_type
+    opts = list(q.options or q.shared_options)
+    correct_display = answer_key
+
+    if q_type == "FIB" and answer_key and not _is_nonneg_numeric(answer_key):
+        q_type = "SCQ"
+        opts, correct_label = _build_fib_options(answer_key, fib_pool)
+        correct_display = correct_label  # letter like "b"
+
+    return q_type, opts, correct_display
+
+
 def _format_options(options: list[QuestionOption], indent: str = "  ") -> list[str]:
     return [f"{indent}({o.label}) {_clean_latex(o.text)}" for o in options]
 
 
-def _format_question(q: FoundationQuestion, seq: int) -> list[str]:
+def _format_question(q: FoundationQuestion, seq: int, fib_pool: list[str]) -> list[str]:
     lines: list[str] = []
-    label = _type_label(q.question_type)
+    was_fib = q.question_type == "FIB"
+
+    q_type, opts, correct_display = _resolve_question(q, fib_pool)
+    label = _type_label(q_type)
     stem = _clean_latex(q.stem.replace("\n", " "))
     lines.append(f"Q{seq}. [{label}]  {stem}")
 
-    opts = q.options or q.shared_options
     lines.extend(_format_options(opts))
 
     if q.column_a:
@@ -48,11 +106,12 @@ def _format_question(q: FoundationQuestion, seq: int) -> list[str]:
         lines.append("  Column II")
         lines.extend(_format_options(q.column_b, indent="    "))
 
-    if q.answer_key:
-        ak = q.answer_key
-        if q.question_type in ("MCQ", "MCQ_MULTI", "ASSERTION_REASON") and len(ak) == 1:
-            ak = f"({ak.lower()})"
-        lines.append(f"  ► Correct Answer: {ak}")
+    if correct_display:
+        if was_fib and q_type == "SCQ":
+            lines.append(f"  ► Correct Answer: ({correct_display})")
+        else:
+            lines.append(f"  ► Correct Answer: {correct_display}")
+
     if q.explanation:
         src = " [LLM]" if q.answer_source == "llm" else ""
         lines.append(f"  ★ Explanation{src}: {_clean_latex(q.explanation)}")
@@ -76,6 +135,7 @@ def format_question_bank(doc: FoundationDocument) -> str:
         "",
     ]
 
+    fib_pool = _build_fib_pool(doc)
     current_section = ""
     seq = 0
 
@@ -97,7 +157,7 @@ def format_question_bank(doc: FoundationDocument) -> str:
                 parts.append("")
 
         seq += 1
-        parts.extend(_format_question(q, seq))
+        parts.extend(_format_question(q, seq, fib_pool))
         parts.append("")
 
     return "\n".join(parts).strip() + "\n"
