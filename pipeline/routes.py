@@ -21,11 +21,20 @@ import json
 from pathlib import Path
 
 from fastapi import APIRouter, File, Form, HTTPException, UploadFile
+from fastapi.responses import HTMLResponse
 
 from extract import detect_format, extract_document
 from pipeline.runner import run_pipeline
 
+_PKG_DIR = Path(__file__).resolve().parent
+STATIC_DIR = _PKG_DIR / "static"
+
 router = APIRouter(tags=["pipeline"])
+
+
+@router.get("/pipeline", response_class=HTMLResponse)
+async def pipeline_page() -> HTMLResponse:
+    return HTMLResponse((STATIC_DIR / "pipeline.html").read_text(encoding="utf-8"))
 
 
 async def _read_mmd(file: UploadFile) -> tuple[str, str]:

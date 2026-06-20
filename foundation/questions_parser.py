@@ -31,7 +31,26 @@ def is_question_section(title: str) -> bool:
 
 
 def is_exercise_header(title: str) -> bool:
-    return bool(re.match(r"Exercise\s+\d+", title, re.IGNORECASE))
+    return bool(re.match(r"(?:ADVANCED\s*)?Exercise\b", title, re.IGNORECASE))
+
+
+def _infer_default_section(directions: str, title: str) -> str:
+    d = (directions or "").lower()
+    t = (title or "").lower()
+    text = d + " " + t
+    if "assertion" in text:
+        return "Assertion & Reason"
+    if "fill in" in text:
+        return "Fill in the Blanks"
+    if "true" in text and "false" in text:
+        return "True/False"
+    if "match" in text:
+        return "Matching"
+    if "integer" in text or "numerical" in text:
+        return "Integer Type"
+    if "multiple choice" in text or "mcq" in text:
+        return "Multiple Choice"
+    return "Multiple Choice"
 
 
 def normalize_section(title: str) -> str:
@@ -262,6 +281,10 @@ def parse_questions_zone(text: str) -> list[FoundationQuestion]:
 
         if DIRECTIONS_RE.match(stripped):
             directions = stripped
+            if exercise and not section:
+                section = _infer_default_section(directions, exercise)
+                shared_options = []
+                in_passage = False
             continue
 
         if SHARED_OPTION_RE.match(stripped):

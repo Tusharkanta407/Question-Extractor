@@ -1,0 +1,247 @@
+.page-wide {
+  max-width: 1100px;
+}
+
+.back-link {
+  margin-bottom: 0.5rem;
+}
+
+.back-link a {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.back-link a:hover {
+  text-decoration: underline;
+}
+
+.upload-card-small {
+  margin-top: 1rem;
+  border-style: solid;
+}
+
+.upload-inner-small {
+  padding: 1.25rem 1.5rem;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.upload-inner-small .upload-title {
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+
+#bankFileName {
+  color: var(--muted);
+}
+
+.toolbar {
+  margin-top: 1.25rem;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+}
+
+.threshold-control {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.threshold-control input {
+  width: 4.5rem;
+  padding: 0.35rem 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font: inherit;
+}
+
+.llm-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.9rem;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+#runBtn {
+  margin-left: auto;
+}
+
+.stats-bar {
+  margin-top: 1.25rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 0.75rem;
+}
+
+.stat {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.85rem 1rem;
+  text-align: center;
+}
+
+.stat-label {
+  display: block;
+  font-size: 0.78rem;
+  color: var(--muted);
+  margin-bottom: 0.25rem;
+}
+
+.stat span:last-child {
+  font-size: 1.3rem;
+  font-weight: 700;
+}
+
+.question-cards {
+  padding: 1rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  max-height: 65vh;
+  overflow: auto;
+}
+
+.question-card {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.9rem 1rem;
+  background: #fbfcfd;
+}
+
+.question-card-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.qid {
+  font-family: Consolas, "Courier New", monospace;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.qtype-badge {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  background: #e8edf3;
+  color: var(--text);
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+}
+
+.question-content {
+  font-size: 0.95rem;
+  line-height: 1.5;
+  margin: 0 0 0.5rem;
+}
+
+.question-content math {
+  font-size: 1em;
+}
+
+.options-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 0.5rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 0.3rem;
+  font-size: 0.88rem;
+}
+
+.options-list li {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.3rem 0.55rem;
+}
+
+.options-list li.correct {
+  border-color: var(--success);
+  background: #ecfdf5;
+}
+
+.tag-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-top: 0.5rem;
+}
+
+.chip {
+  font-size: 0.72rem;
+  padding: 0.15rem 0.55rem;
+  border-radius: 999px;
+  font-weight: 600;
+}
+
+.chip-difficulty-easy { background: #ecfdf5; color: var(--success); }
+.chip-difficulty-medium { background: #fffbeb; color: #92400e; }
+.chip-difficulty-hard { background: #fef2f2; color: var(--error); }
+.chip-bloom { background: #eff6ff; color: #1e40af; }
+.chip-topic { background: #f3e8ff; color: #6b21a8; }
+.chip-exam { background: #e8edf3; color: var(--text); }
+
+.dropped-result {
+  margin-top: 1.25rem;
+}
+
+.dropped-list {
+  padding: 0.5rem 1.25rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.dropped-item {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.6rem 0.8rem;
+  font-size: 0.88rem;
+  background: #fafbfc;
+}
+
+.dropped-item .dropped-reason {
+  font-weight: 700;
+  color: var(--error);
+  text-transform: uppercase;
+  font-size: 0.72rem;
+  margin-right: 0.5rem;
+}
+
+.dropped-item .dropped-match {
+  display: block;
+  color: var(--muted);
+  margin-top: 0.25rem;
+  font-size: 0.82rem;
+}
+
+@media (max-width: 640px) {
+  .toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  #runBtn {
+    margin-left: 0;
+  }
+}

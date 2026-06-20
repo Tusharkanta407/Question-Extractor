@@ -128,7 +128,13 @@ def parse_solutions_zone(text: str) -> list[ParsedAnswer]:
             if is_exercise_header(title):
                 exercise = title
                 subsection = ""
-                section = ""
+                # Some exercises (e.g. "ADVANCEDEXERCISE BASED ON CONNECTING
+                # TOPICS") have numbered answers directly under the exercise
+                # header with no explicit question-type subsection. Default
+                # to "Multiple Choice" so ANSWER_LINE_RE entries still get
+                # picked up instead of being silently dropped (mirrors the
+                # same default used in questions_parser.py).
+                section = "Multiple Choice"
                 continue
             if SUBSECTION_RE.match(title):
                 subsection = title
@@ -185,6 +191,7 @@ def pair_answers(
     by_exact: dict[tuple[str, str, str, int], ParsedAnswer] = {}
     by_no_sub: dict[tuple[str, str, int], list[ParsedAnswer]] = {}
     by_section: dict[tuple[str, int], list[ParsedAnswer]] = {}
+    by_exercise_only: dict[tuple[str, int], list[ParsedAnswer]] = {}
 
     for a in answers:
         by_exact[answer_key_tuple(a)] = a
@@ -192,6 +199,8 @@ def pair_answers(
         by_no_sub.setdefault(nk, []).append(a)
         sk = (normalize_section(a.section), a.qnum)
         by_section.setdefault(sk, []).append(a)
+        ek = (a.exercise, a.qnum)
+        by_exercise_only.setdefault(ek, []).append(a)
 
     paired = 0
     for q in questions:
@@ -212,6 +221,17 @@ def pair_answers(
         if not ans:
             sk = (normalize_section(q.section), q.qnum)
             cands = by_section.get(sk, [])
+            if len(cands) == 1:
+                ans = cands[0]
+        if not ans:
+            # Last-resort fallback: same exercise + same question number,
+            # regardless of section label. Covers files where the
+            # question-type subsection couldn't be reliably inferred the
+            # same way in both the questions zone and solutions zone
+            # (e.g. answer-only exercises with no DIRECTIONS line to infer
+            # type from).
+            ek = (q.exercise, q.qnum)
+            cands = by_exercise_only.get(ek, [])
             if len(cands) == 1:
                 ans = cands[0]
         if ans:

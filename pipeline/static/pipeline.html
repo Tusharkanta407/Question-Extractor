@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Post-Extraction Pipeline</title>
+  <link rel="stylesheet" href="/static/style.css" />
+  <link rel="stylesheet" href="/pipeline-static/pipeline.css" />
+</head>
+<body>
+  <div class="page page-wide">
+    <header>
+      <p class="back-link"><a href="/">← MMD Q&amp;A Extractor</a></p>
+      <h1>Post-Extraction Pipeline</h1>
+      <p>Extract → classify → embeddings → similarity dedup → clean → MathML → competitive tagging → JSON.</p>
+    </header>
+
+    <section class="upload-card" id="dropzone">
+      <input type="file" id="fileInput" accept=".mmd" hidden />
+      <div class="upload-inner">
+        <div class="upload-icon" aria-hidden="true">&#129513;</div>
+        <p class="upload-title">Drop a .mmd chapter file here</p>
+        <p class="upload-hint">or <button type="button" class="link-btn" id="browseBtn">browse</button></p>
+      </div>
+    </section>
+
+    <section class="upload-card upload-card-small" id="bankDropzone">
+      <input type="file" id="bankFileInput" accept=".mmd,.json" hidden />
+      <div class="upload-inner upload-inner-small">
+        <p class="upload-title">Optional: existing question bank to dedupe against</p>
+        <p class="upload-hint">
+          <span id="bankFileName">No file selected</span> ·
+          <button type="button" class="link-btn" id="bankBrowseBtn">browse</button>
+          <button type="button" class="link-btn" id="bankClearBtn" hidden>clear</button>
+        </p>
+      </div>
+    </section>
+
+    <div class="toolbar" id="toolbar" hidden>
+      <label class="threshold-control">
+        Similarity threshold
+        <input type="number" id="threshold" min="0" max="1" step="0.01" value="0.93" />
+      </label>
+      <label class="llm-toggle">
+        <input type="checkbox" id="skipEmbeddings" />
+        Skip embeddings (no dedup, no API cost)
+      </label>
+      <label class="llm-toggle">
+        <input type="checkbox" id="ruleBasedTagging" />
+        Rule-based tagging only (no LLM)
+      </label>
+      <button type="button" class="btn primary" id="runBtn">Run pipeline</button>
+    </div>
+
+    <div id="status" class="status" hidden></div>
+
+    <section id="stats" class="stats-bar" hidden>
+      <div class="stat"><span class="stat-label">Input</span><span id="statInput">0</span></div>
+      <div class="stat"><span class="stat-label">Embedded</span><span id="statEmbedded">0</span></div>
+      <div class="stat"><span class="stat-label">Dropped (dup)</span><span id="statDupDropped">0</span></div>
+      <div class="stat"><span class="stat-label">Dropped (empty)</span><span id="statEmptyDropped">0</span></div>
+      <div class="stat"><span class="stat-label">MathML conversions</span><span id="statMathml">0</span></div>
+      <div class="stat"><span class="stat-label">Output</span><span id="statOutput">0</span></div>
+    </section>
+
+    <section id="result" class="result" hidden>
+      <div class="result-header">
+        <div>
+          <h2 id="resultTitle">Pipeline Output</h2>
+          <p class="meta" id="resultMeta"></p>
+        </div>
+        <div class="actions">
+          <button type="button" class="btn secondary" id="viewToggleBtn">View raw JSON</button>
+          <button type="button" class="btn secondary" id="copyBtn">Copy JSON</button>
+          <button type="button" class="btn primary" id="downloadJsonBtn">Download .json</button>
+        </div>
+      </div>
+
+      <div id="cardsView" class="question-cards"></div>
+      <pre id="output" class="output" hidden></pre>
+    </section>
+
+    <section id="droppedSection" class="result dropped-result" hidden>
+      <div class="result-header">
+        <div>
+          <h2>Dropped questions</h2>
+          <p class="meta" id="droppedMeta"></p>
+        </div>
+      </div>
+      <div id="droppedList" class="dropped-list"></div>
+    </section>
+  </div>
+  <script src="/pipeline-static/pipeline.js?v=1"></script>
+</body>
+</html>

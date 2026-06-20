@@ -24,11 +24,13 @@ APP_DIR = Path(__file__).resolve().parent
 STATIC_DIR = APP_DIR / "static"
 BYPASS_STATIC_DIR = APP_DIR / "bypass_question" / "static"
 FOUNDATION_STATIC_DIR = APP_DIR / "foundation" / "static"
+PIPELINE_STATIC_DIR = APP_DIR / "pipeline" / "static"
 
 app = FastAPI(title="MMD Q&A Extractor")
 app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 app.mount("/bypass-static", StaticFiles(directory=BYPASS_STATIC_DIR), name="bypass-static")
 app.mount("/foundation-static", StaticFiles(directory=FOUNDATION_STATIC_DIR), name="foundation-static")
+app.mount("/pipeline-static", StaticFiles(directory=PIPELINE_STATIC_DIR), name="pipeline-static")
 app.include_router(bypass_router)
 app.include_router(foundation_router)
 app.include_router(pipeline_router)

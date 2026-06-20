@@ -4,7 +4,9 @@ from __future__ import annotations
 
 import re
 
-EXERCISE_START_RE = re.compile(r"\\section\*\{(Exercise\s+[^}]+)\}", re.IGNORECASE)
+EXERCISE_START_RE = re.compile(
+    r"\\section\*\{((?:ADVANCED\s*)?Exercise[^}]*)\}", re.IGNORECASE
+)
 SOLUTIONS_START_RE = re.compile(
     r"\\section\*\{(?:SOLUTIONS|Answer\s*Key|Answers)\b", re.IGNORECASE
 )
