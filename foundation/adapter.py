@@ -46,14 +46,15 @@ def foundation_to_extracted(doc: FoundationDocument) -> ExtractedDocument:
                 # Invalid answer (negative / text) — flag for review, keep type
                 needs_review = True
 
-        # ── Rule 2: FIB with word answer → convert to SCQ ───────────────────
-        elif q_type == "FIB" and answer_key:
-            if not _is_nonneg_numeric(answer_key):
-                # Word/phrase answer → promote to SCQ with options
-                q_type = "SCQ"
+        # ── Rule 2: ALL FIB → convert to SCQ ────────────────────────────────
+        elif q_type == "FIB":
+            q_type = "SCQ"
+            convertible = True
+            if answer_key:
                 opts = _fib_to_scq_options(answer_key)
                 needs_review = True   # distractors (b)(c)(d) need real values
-                convertible = True
+            else:
+                needs_review = True
 
         questions.append(
             Question(
