@@ -6,6 +6,29 @@
   <title>Foundation Question Bank</title>
   <link rel="stylesheet" href="/static/style.css" />
   <link rel="stylesheet" href="/foundation-static/foundation.css" />
+  <style>
+    .result-subjective {
+      margin-top: 2rem;
+      border-top: 2px dashed #c0c0c0;
+      padding-top: 1.5rem;
+    }
+    .result-subjective .result-header h2 {
+      color: #7a5c00;
+    }
+    .output-subjective {
+      background: #fffdf5;
+      border-color: #e8d87a;
+      color: #4a3c00;
+    }
+    .result-subjective .btn {
+      background: #f5f0dc;
+      color: #5a4400;
+      border: 1px solid #c8b86a;
+    }
+    .result-subjective .btn:hover {
+      background: #ede4c0;
+    }
+  </style>
 </head>
 <body>
   <div class="page page-wide">
@@ -35,14 +58,16 @@
     <div id="status" class="status" hidden></div>
 
     <section id="stats" class="stats-bar" hidden>
-      <div class="stat"><span class="stat-label">Questions</span><span id="statQuestions">0</span></div>
+      <div class="stat"><span class="stat-label">Total Questions</span><span id="statQuestions">0</span></div>
+      <div class="stat"><span class="stat-label">Objective</span><span id="statObjective">0</span></div>
+      <div class="stat"><span class="stat-label">Subjective</span><span id="statSubjective">0</span></div>
       <div class="stat"><span class="stat-label">Book answers</span><span id="statBook">0</span></div>
       <div class="stat"><span class="stat-label">LLM filled</span><span id="statLlm">0</span></div>
-      <div class="stat"><span class="stat-label">Subjective skipped</span><span id="statSkipped">0</span></div>
       <div class="stat"><span class="stat-label">Obj. still missing</span><span id="statMissing">0</span></div>
       <div class="stat"><span class="stat-label">LLM tokens (in/out)</span><span id="statLlmTokens">—</span></div>
     </section>
 
+    <!-- Objective Question Bank -->
     <section id="result" class="result" hidden>
       <div class="result-header">
         <div>
@@ -58,7 +83,122 @@
       </div>
       <pre id="output" class="output"></pre>
     </section>
+
+    <!-- Subjective Questions (separate download) -->
+    <section id="resultSubjective" class="result result-subjective" hidden>
+      <div class="result-header">
+        <div>
+          <h2 id="resultSubjectiveTitle">Subjective Questions</h2>
+          <p class="meta" id="resultSubjectiveMeta"></p>
+        </div>
+        <div class="actions">
+          <button type="button" class="btn secondary" id="copySubjectiveBtn">Copy</button>
+          <button type="button" class="btn secondary" id="downloadSubjectiveDocxBtn">Download .docx</button>
+          <button type="button" class="btn secondary" id="downloadSubjectiveMmdBtn">Download .mmd</button>
+        </div>
+      </div>
+      <pre id="outputSubjective" class="output output-subjective"></pre>
+    </section>
   </div>
-  <script src="/foundation-static/foundation.js?v=3"></script>
+  <script src="/foundation-static/foundation.js?v=4"></script>
+  <script>
+  // ── Subjective section wiring ────────────────────────────────────────────
+  (function () {
+    // Patch fetch to intercept the /extract response and pull subjective data
+    const _origFetch = window.fetch;
+    window.fetch = function (input, init) {
+      const url = typeof input === 'string' ? input : (input?.url || '');
+      const p = _origFetch.apply(this, arguments);
+
+      if (url.includes('/api/foundation/extract')) {
+        p.then(function (resp) {
+          // Clone so foundation.js can still read the original
+          resp.clone().json().then(function (d) {
+            applySubjectiveData(d);
+          }).catch(function () {});
+        }).catch(function () {});
+      }
+      return p;
+    };
+
+    function applySubjectiveData(d) {
+      // Update stats
+      const elObj  = document.getElementById('statObjective');
+      const elSubj = document.getElementById('statSubjective');
+      if (elObj)  elObj.textContent  = d.objective_count  ?? '—';
+      if (elSubj) elSubj.textContent = d.subjective_count ?? '—';
+
+      const sec = document.getElementById('resultSubjective');
+      if (!sec) return;
+
+      if (d.subjective_count > 0 && d.subjective_content) {
+        document.getElementById('resultSubjectiveTitle').textContent =
+          'Subjective Questions (' + d.subjective_count + ')';
+        document.getElementById('resultSubjectiveMeta').textContent =
+          'VSA / SA / LA / Descriptive / Passage / Case Study — cannot be converted ' +
+          'to MCQ/SCQ/INTEGER. Download separately below.';
+        document.getElementById('outputSubjective').textContent = d.subjective_content;
+        sec.dataset.filenameMmd  = d.filename_subjective_mmd  || '';
+        sec.dataset.filenameDocx = d.filename_subjective_docx || '';
+        sec.hidden = false;
+      } else {
+        sec.hidden = true;
+      }
+    }
+
+    // Copy subjective text
+    document.getElementById('copySubjectiveBtn')?.addEventListener('click', function () {
+      const text = document.getElementById('outputSubjective')?.textContent || '';
+      navigator.clipboard.writeText(text).then(function () {
+        const btn = document.getElementById('copySubjectiveBtn');
+        const orig = btn.textContent;
+        btn.textContent = 'Copied!';
+        setTimeout(function () { btn.textContent = orig; }, 1500);
+      });
+    });
+
+    // Generic subjective download
+    function downloadSubjective(fmt) {
+      const fileInput = document.getElementById('fileInput');
+      if (!fileInput?.files?.length) {
+        alert('No file selected — please upload the .mmd file first.');
+        return;
+      }
+      const useLlm = document.getElementById('useLlm')?.checked ? 'true' : 'false';
+      const form = new FormData();
+      form.append('file', fileInput.files[0]);
+      form.append('output_format', fmt);
+      form.append('use_llm', useLlm);
+
+      const btnId = fmt === 'docx' ? 'downloadSubjectiveDocxBtn' : 'downloadSubjectiveMmdBtn';
+      const btn   = document.getElementById(btnId);
+      const orig  = btn.textContent;
+      btn.textContent = 'Downloading…';
+      btn.disabled = true;
+
+      fetch('/api/foundation/download-subjective', { method: 'POST', body: form })
+        .then(function (r) {
+          if (!r.ok) return r.json().then(function (j) { throw new Error(j.detail || r.statusText); });
+          const cd = r.headers.get('Content-Disposition') || '';
+          const m  = cd.match(/filename="([^"]+)"/);
+          const filename = m ? m[1] : ('subjective_questions.' + fmt);
+          return r.blob().then(function (blob) { return { blob, filename }; });
+        })
+        .then(function ({ blob, filename }) {
+          const url = URL.createObjectURL(blob);
+          const a   = document.createElement('a');
+          a.href = url; a.download = filename; a.click();
+          URL.revokeObjectURL(url);
+        })
+        .catch(function (err) { alert('Download failed: ' + err.message); })
+        .finally(function () { btn.textContent = orig; btn.disabled = false; });
+    }
+
+    document.getElementById('downloadSubjectiveMmdBtn')
+      ?.addEventListener('click', function () { downloadSubjective('mmd'); });
+    document.getElementById('downloadSubjectiveDocxBtn')
+      ?.addEventListener('click', function () { downloadSubjective('docx'); });
+  })();
+  </script>
 </body>
 </html>
