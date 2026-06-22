@@ -58,12 +58,12 @@ def _build_fib_options(correct: str, pool: list[str]) -> tuple[list[QuestionOpti
 
 
 def _build_fib_pool(doc: FoundationDocument) -> list[str]:
+    """Collect all FIB answers (word and numeric) to use as distractor pool for SCQ options."""
     return [
         q.answer_key.strip()
         for q in doc.questions
         if q.question_type == "FIB"
         and (q.answer_key or "").strip()
-        and not _is_nonneg_numeric(q.answer_key.strip())
     ]
 
 
@@ -76,10 +76,14 @@ def _resolve_question(
     opts = list(q.options or q.shared_options)
     correct_display = answer_key
 
-    if q_type == "FIB" and answer_key and not _is_nonneg_numeric(answer_key):
+    # ALL FIB → SCQ regardless of whether answer is numeric or word
+    if q_type == "FIB":
         q_type = "SCQ"
-        opts, correct_label = _build_fib_options(answer_key, fib_pool)
-        correct_display = correct_label  # letter like "b"
+        if answer_key:
+            opts, correct_label = _build_fib_options(answer_key, fib_pool)
+            correct_display = correct_label  # letter like "b"
+        else:
+            correct_display = ""
 
     return q_type, opts, correct_display
 
@@ -126,20 +130,27 @@ def format_question_bank(doc: FoundationDocument) -> str:
     else:
         title_line = f"  {title_upper}"
 
+    # Only objective questions go into the main question bank
+    objective_qs = [q for q in doc.questions if is_objective_q(q)]
+    subjective_count = len(doc.questions) - len(objective_qs)
+
     parts: list[str] = [
         _HEADER_EQ,
         title_line,
         f"  Foundation {doc.subject} | Class {doc.class_level}",
-        f"  Total Questions: {len(doc.questions)}",
-        _HEADER_EQ,
-        "",
+        f"  Total Questions: {len(objective_qs)} (objective)",
     ]
+    if subjective_count:
+        parts.append(
+            f"  Subjective Questions: {subjective_count} (see separate download)"
+        )
+    parts += [_HEADER_EQ, ""]
 
     fib_pool = _build_fib_pool(doc)
     current_section = ""
     seq = 0
 
-    for q in doc.questions:
+    for q in objective_qs:
         section_label = q.section
         if q.exercise:
             section_label = f"{q.exercise} › {section_label}"
@@ -166,3 +177,86 @@ def format_question_bank(doc: FoundationDocument) -> str:
 def output_filename(stem: str, ext: str = "mmd") -> str:
     base = stem.replace("_qa", "")
     return f"{base}_question_bank.{ext.lstrip('.')}"
+
+
+# ── Question type classification ─────────────────────────────────────────────
+
+OBJECTIVE_TYPES = frozenset({
+    "MCQ", "MCQ_MULTI", "ASSERTION_REASON", "FIB", "SCQ", "TRUE_FALSE",
+    "INTEGER", "MATCH",
+})
+
+SUBJECTIVE_TYPES = frozenset({
+    "VSA", "SA", "LA", "DESCRIPTIVE", "TEXTBOOK", "PASSAGE", "CASE_STUDY",
+})
+
+
+def is_objective_q(q: FoundationQuestion) -> bool:
+    return q.question_type in OBJECTIVE_TYPES
+
+
+def is_subjective_q(q: FoundationQuestion) -> bool:
+    return q.question_type in SUBJECTIVE_TYPES
+
+
+def format_subjective_bank(doc: FoundationDocument) -> str:
+    """Format only the subjective (non-convertible) questions."""
+    subj_qs = [q for q in doc.questions if is_subjective_q(q)]
+    if not subj_qs:
+        return ""
+
+    title_upper = doc.title.upper()
+    title_line = (
+        f"  {title_upper} - SUBJECTIVE QUESTIONS"
+        if "SUBJECTIVE" not in title_upper
+        else f"  {title_upper}"
+    )
+
+    parts: list[str] = [
+        _HEADER_EQ,
+        title_line,
+        f"  Foundation {doc.subject} | Class {doc.class_level}",
+        f"  Total Subjective Questions: {len(subj_qs)}",
+        "  NOTE: These questions could not be converted to MCQ/SCQ/INTEGER format.",
+        _HEADER_EQ,
+        "",
+    ]
+
+    current_section = ""
+    seq = 0
+
+    for q in subj_qs:
+        section_label = q.section
+        if q.exercise:
+            section_label = f"{q.exercise} › {section_label}"
+        if q.subsection:
+            section_label = f"{q.subsection} › {section_label}"
+
+        if section_label != current_section:
+            current_section = section_label
+            parts.extend(["", _LINE, f"  SECTION: {q.section.upper()}", _LINE, ""])
+            if q.directions:
+                parts.append(f"  {q.directions}")
+                parts.append("")
+            if q.passage:
+                parts.append(f"  Passage: {_clean_latex(q.passage)}")
+                parts.append("")
+
+        seq += 1
+        label = _type_label(q.question_type)
+        stem = _clean_latex(q.stem.replace("\n", " "))
+        parts.append(f"Q{seq}. [{label}]  {stem}")
+
+        if q.answer_key:
+            parts.append(f"  ► Answer: {_clean_latex(q.answer_key)}")
+        if q.explanation:
+            src = " [LLM]" if q.answer_source == "llm" else ""
+            parts.append(f"  ★ Explanation{src}: {_clean_latex(q.explanation)}")
+        parts.append("")
+
+    return "\n".join(parts).strip() + "\n"
+
+
+def subjective_output_filename(stem: str, ext: str = "mmd") -> str:
+    base = stem.replace("_qa", "")
+    return f"{base}_subjective_questions.{ext.lstrip('.')}"
