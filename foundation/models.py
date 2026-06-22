@@ -83,14 +83,17 @@ class FoundationQuestion:
             if not _is_nonneg_numeric(answer_key):
                 needs_review = True
 
-        # ── Rule 2: FIB with word answer → convert to SCQ ───────────────────
-        elif q_type == "FIB" and answer_key:
-            if not _is_nonneg_numeric(answer_key):
-                q_type = "SCQ"
+        # ── Rule 2: ALL FIB → convert to SCQ (word OR numeric) ───────────────
+        elif q_type == "FIB":
+            q_type = "SCQ"
+            convertible = True
+            if answer_key:
                 pool = fib_pool or []
                 opts, correct_label = _build_fib_options(answer_key, pool)
                 needs_review = any(o["text"] == "___" for o in opts)
-                convertible = True
+            else:
+                # No answer yet — mark for review, empty options
+                needs_review = True
 
         d["question_type"] = q_type
         d["options"] = opts
@@ -127,7 +130,6 @@ class FoundationDocument:
             for q in self.questions
             if q.question_type == "FIB"
             and (q.answer_key or "").strip()
-            and not _is_nonneg_numeric(q.answer_key.strip())
         ]
 
         book = sum(1 for q in self.questions if q.answer_source == "book")
