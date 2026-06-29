@@ -31,14 +31,7 @@ def _build_fib_pool(doc: FoundationDocument) -> list[str]:
 
 def _build_fib_options(correct: str, pool: list[str]) -> tuple[list[QuestionOption], str]:
     """Build 4 MCQ options. Correct answer placed randomly in (a-d)."""
-    clean_pool = [
-        p for p in pool
-        if p.lower() != correct.lower()
-        and len(p) <= 60
-        and "\n" not in p
-        and p != "___"
-    ]
-    distractors = clean_pool
+    distractors = [p for p in pool if p.lower() != correct.lower()]
     random.shuffle(distractors)
     distractors = distractors[:3]
     while len(distractors) < 3:
@@ -97,12 +90,9 @@ EXCLUDED_TYPES = frozenset({
     "TRUE_FALSE",
 })
 
-# Questions that go into the separate download (not the main objective bank)
-_SEPARATE_DOWNLOAD_TYPES = SUBJECTIVE_TYPES | EXCLUDED_TYPES
-
 OBJECTIVE_TYPES = frozenset({
-    "MCQ", "MCQ_MULTI", "ASSERTION_REASON", "FIB", "SCQ",
-    "INTEGER", "MATCH", "PASSAGE",
+    "MCQ", "MCQ_MULTI", "ASSERTION_REASON", "FIB", "SCQ", "INTEGER", "MATCH", "PASSAGE",
+    "INTEGER", "MATCH",
 })
 
 
@@ -118,12 +108,12 @@ def export_docx(doc: FoundationDocument, out_path: str | Path) -> Path:
     sub = docx.add_paragraph(f"Foundation {doc.subject} | Class {doc.class_level}")
     sub.alignment = WD_ALIGN_PARAGRAPH.CENTER
 
-    objective_qs = [q for q in doc.questions if q.question_type not in _SEPARATE_DOWNLOAD_TYPES]
+    objective_qs = [q for q in doc.questions if q.question_type not in (SUBJECTIVE_TYPES | EXCLUDED_TYPES)]
     subjective_count = len(doc.questions) - len(objective_qs)
 
     if subjective_count:
         note = docx.add_paragraph(
-            f"Note: {subjective_count} True/False and subjective question(s) excluded — see separate download."
+            f"Note: {subjective_count} subjective question(s) excluded — see separate download."
         )
         note.runs[0].italic = True
         note.alignment = WD_ALIGN_PARAGRAPH.CENTER
@@ -195,7 +185,7 @@ def export_docx(doc: FoundationDocument, out_path: str | Path) -> Path:
 def export_subjective_docx(doc: FoundationDocument, out_path: str | Path) -> Path:
     """Export subjective (non-convertible) questions to a separate .docx."""
     out_path = Path(out_path)
-    subjective_qs = [q for q in doc.questions if q.question_type in _SEPARATE_DOWNLOAD_TYPES]
+    subjective_qs = [q for q in doc.questions if q.question_type in SUBJECTIVE_TYPES]
 
     docx = Document()
 
@@ -206,9 +196,8 @@ def export_subjective_docx(doc: FoundationDocument, out_path: str | Path) -> Pat
     sub.alignment = WD_ALIGN_PARAGRAPH.CENTER
 
     note = docx.add_paragraph(
-        f"Total: {len(subjective_qs)} excluded question(s). "
-        "Includes True/False questions and subjective questions (VSA/SA/LA/Descriptive) "
-        "that could not be converted to MCQ/SCQ/INTEGER format."
+        f"Total: {len(subjective_qs)} subjective question(s). "
+        "These could not be converted to MCQ/SCQ/INTEGER format."
     )
     note.runs[0].italic = True
     note.alignment = WD_ALIGN_PARAGRAPH.CENTER

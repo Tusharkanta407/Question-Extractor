@@ -16,15 +16,8 @@ def _build_fib_options(correct: str, pool: list[str]) -> list[dict]:
     Place correct answer randomly in (a/b/c/d).
     Fill remaining slots from pool (other FIB answers), avoiding duplicates.
     """
-    # Filter pool: short single-line answers only (no garbage multi-word dumps)
-    clean_pool = [
-        p for p in pool
-        if p.lower() != correct.lower()
-        and len(p) <= 60
-        and "\n" not in p
-        and p != "___"
-    ]
-    distractors = clean_pool
+    # Distractors = other answers from pool, excluding correct
+    distractors = [p for p in pool if p.lower() != correct.lower()]
     random.shuffle(distractors)
     distractors = distractors[:3]
 
@@ -131,14 +124,12 @@ class FoundationDocument:
     def to_dict(self) -> dict:
         from foundation.answer_llm import is_objective, needs_llm_answer
 
-        # Build pool of clean FIB answers (short, single-line) for distractor use
+        # Build pool of all word-based FIB answers in this document
         fib_pool = [
             q.answer_key.strip()
             for q in self.questions
             if q.question_type == "FIB"
             and (q.answer_key or "").strip()
-            and len(q.answer_key.strip()) <= 60
-            and "\n" not in q.answer_key
         ]
 
         book = sum(1 for q in self.questions if q.answer_source == "book")

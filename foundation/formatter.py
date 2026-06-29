@@ -182,12 +182,16 @@ def output_filename(stem: str, ext: str = "mmd") -> str:
 # ── Question type classification ─────────────────────────────────────────────
 
 OBJECTIVE_TYPES = frozenset({
-    "MCQ", "MCQ_MULTI", "ASSERTION_REASON", "FIB", "SCQ", "TRUE_FALSE",
+    "MCQ", "MCQ_MULTI", "ASSERTION_REASON", "FIB", "SCQ", "INTEGER", "MATCH", "PASSAGE",
     "INTEGER", "MATCH",
 })
 
 SUBJECTIVE_TYPES = frozenset({
-    "VSA", "SA", "LA", "DESCRIPTIVE", "TEXTBOOK", "PASSAGE", "CASE_STUDY",
+    "VSA", "SA", "LA", "DESCRIPTIVE", "TEXTBOOK", "CASE_STUDY",
+})
+
+EXCLUDED_TYPES = frozenset({
+    "TRUE_FALSE",
 })
 
 
@@ -196,7 +200,7 @@ def is_objective_q(q: FoundationQuestion) -> bool:
 
 
 def is_subjective_q(q: FoundationQuestion) -> bool:
-    return q.question_type in SUBJECTIVE_TYPES
+    return q.question_type in SUBJECTIVE_TYPES or q.question_type in EXCLUDED_TYPES
 
 
 def format_subjective_bank(doc: FoundationDocument) -> str:

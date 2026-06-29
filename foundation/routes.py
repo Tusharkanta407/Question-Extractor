@@ -15,7 +15,6 @@ from foundation.formatter import (
     output_filename,
     subjective_output_filename,
     SUBJECTIVE_TYPES,
-    EXCLUDED_TYPES,
 )
 from foundation.pipeline import (
     estimate_file_tokens,
@@ -47,9 +46,8 @@ async def _read_mmd(file: UploadFile) -> tuple[str, str]:
 
 
 def _stats_from_doc(doc) -> dict:
-    _excluded = SUBJECTIVE_TYPES | EXCLUDED_TYPES
     obj_missing = sum(1 for q in doc.questions if needs_llm_answer(q))
-    subjective_count = sum(1 for q in doc.questions if q.question_type in _excluded)
+    subjective_count = sum(1 for q in doc.questions if q.question_type in SUBJECTIVE_TYPES)
     objective_count = len(doc.questions) - subjective_count
     return {
         "objective_missing": obj_missing,
@@ -181,7 +179,7 @@ async def foundation_download_subjective(
     except RuntimeError as exc:
         raise HTTPException(status_code=500, detail=str(exc)) from exc
 
-    subj_count = sum(1 for q in doc.questions if q.question_type in (SUBJECTIVE_TYPES | EXCLUDED_TYPES))
+    subj_count = sum(1 for q in doc.questions if q.question_type in SUBJECTIVE_TYPES)
     if not subj_count:
         raise HTTPException(
             status_code=404,

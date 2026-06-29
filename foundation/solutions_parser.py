@@ -55,6 +55,41 @@ def _parse_answer_body(body: str, section: str) -> tuple[str, str]:
     return "", body.strip()
 
 
+
+
+def _parse_fib_latex_array(line):
+    import re as _re
+    # Step 1: extract all \text{...} and \mathbf{...} contents in order
+    tokens = _re.findall(r'\\(?:text|mathbf)\s*\{\s*([^}]*)\s*\}', line)
+    # tokens will be like: ['1. ', 'basic', '2. ', 'hydrogen', '3. ', 'corrosion', '4. ', 'silver', '5 .', 'magnesium', '6 .', 'amalgam, less']
+    results = []
+    i = 0
+    while i < len(tokens) - 1:
+        num_token = tokens[i].strip().rstrip('.')
+        val_token = tokens[i+1].strip()
+        if _re.match(r'^\d+$', num_token.replace(' ', '')):
+            qnum = int(num_token.replace(' ', ''))
+            if val_token and not _re.match(r'^\d+\s*\.?$', val_token):
+                results.append((qnum, val_token))
+                i += 2
+                continue
+        i += 1
+    return results
+
+def _parse_fib_inline_line(line):
+    import re as _re
+    pattern = _re.compile(r'(\d+)\.\s+([^0-9]+?)(?=\s+\d+\.|$)')
+    results = []
+    for m in pattern.finditer(line):
+        qnum = int(m.group(1))
+        answer = m.group(2).strip().rstrip(',').strip()
+        if answer:
+            results.append((qnum, answer))
+    return results
+
+def _is_fib_section(section):
+    return 'fill in' in section.lower()
+
 def parse_solutions_zone(text: str) -> list[ParsedAnswer]:
     text = preprocess(text)
     lines = text.splitlines()
@@ -106,6 +141,48 @@ def parse_solutions_zone(text: str) -> list[ParsedAnswer]:
         if not stripped:
             continue
 
+        if 'begin{array}' in stripped:
+            from foundation.solutions_parser import _parse_fib_latex_array
+            fib_pairs = _parse_fib_latex_array(stripped)
+            if fib_pairs:
+                for qnum, answer in fib_pairs:
+                    answers.append(ParsedAnswer(
+                        qnum=qnum,
+                        answer_key=answer,
+                        explanation="",
+                        exercise=exercise,
+                        subsection=subsection,
+                        section=section if section else "Fill in the Blanks",
+                    ))
+                continue
+
+        if _is_fib_section(section) and 'begin{array}' in stripped:
+            fib_pairs = _parse_fib_latex_array(stripped)
+            for qnum, answer in fib_pairs:
+                answers.append(ParsedAnswer(
+                    qnum=qnum,
+                    answer_key=answer,
+                    explanation="",
+                    exercise=exercise,
+                    subsection=subsection,
+                    section=section,
+                ))
+            continue
+
+        # Handle LaTeX array FIB answers: $\begin{array}...
+        if _is_fib_section(section) and 'begin{array}' in stripped:
+            fib_pairs = _parse_fib_latex_array(stripped)
+            for qnum, answer in fib_pairs:
+                answers.append(ParsedAnswer(
+                    qnum=qnum,
+                    answer_key=answer,
+                    explanation="",
+                    exercise=exercise,
+                    subsection=subsection,
+                    section=section,
+                ))
+            continue
+
         if SKIP_SECTION_RE.search(stripped) and not SECTION_HEADER_RE.match(stripped):
             flush(i - 1)
             continue
@@ -147,6 +224,20 @@ def parse_solutions_zone(text: str) -> list[ParsedAnswer]:
 
         m = ANSWER_LINE_RE.match(stripped)
         if m and section:
+            if _is_fib_section(section):
+                fib_pairs = _parse_fib_inline_line(stripped)
+                if len(fib_pairs) > 1:
+                    flush(i - 1)
+                    for qnum, answer in fib_pairs:
+                        answers.append(ParsedAnswer(
+                            qnum=qnum,
+                            answer_key=answer,
+                            explanation='',
+                            exercise=exercise,
+                            subsection=subsection,
+                            section=section,
+                        ))
+                    continue
             flush(i - 1)
             buf_num = int(m.group(1))
             buf_key = (m.group(2) or "").strip()
